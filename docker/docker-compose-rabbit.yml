@@ -1,0 +1,13 @@
+version: '3'
+services:
+  rabbitmq:
+    image: rabbitmq:3.9.29-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - custom_network
+    container_name: rabbitmq
+networks:
+  custom_network:
+    driver: bridge
