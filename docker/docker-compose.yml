@@ -1,31 +1,50 @@
 version: '3'
 services:
   rabbitmq:
-    image: rabbitmq:3.9.29-management
+    build:
+      context: ./
+      dockerfile: ./DockerFile
     ports:
       - "5672:5672"
       - "15672:15672"
     networks:
       - custom_network
     container_name: rabbitmq
+    hostname: rabbitmq
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:15672" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
   sender:
     build:
       context: ../sender/
       dockerfile: ./docker/DockerFile
-    image: patterns/cache
     networks:
       - custom_network
-    hostname: application
+    hostname: sender
     ports:
       - "8080:8080"
-    container_name: application
+    container_name: sender
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://application:8080/status" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
       interval: 30s
       timeout: 10s
       retries: 5
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
+  receiver:
+    build:
+      context: ../receiver/
+      dockerfile: ./docker/DockerFile
+    networks:
+      - custom_network
+    hostname: receiver
+    container_name: receiver
+    depends_on:
+      sender:
+        condition: service_healthy
 networks:
   custom_network:
     driver: bridge

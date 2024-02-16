@@ -13,5 +13,6 @@
     </properties>
     <modules>
         <module>sender</module>
+        <module>receiver</module>
     </modules>
 </project>

@@ -4,9 +4,6 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
-import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -40,36 +37,6 @@ public class RabbitMqConfig {
     @Bean
     Binding bindingPerson(Queue personQueue, TopicExchange exchange) {
         return BindingBuilder.bind(personQueue).to(exchange).with("person");
-    }
-
-    @Bean
-    MessageListenerAdapter carListenerAdapter(Receiver receiver) {
-        return new MessageListenerAdapter(receiver);
-    }
-
-    @Bean
-    MessageListenerAdapter personListenerAdapter(Receiver receiver) {
-        return new MessageListenerAdapter(receiver);
-    }
-
-    @Bean
-    SimpleMessageListenerContainer personListener (ConnectionFactory connectionFactory, MessageListenerAdapter personListenerAdapter) {
-        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(personQueueName);
-        container.setConsumerTagStrategy(tag -> "MyPersonConsumer");
-        container.setMessageListener(personListenerAdapter);
-        return container;
-    }
-
-    @Bean
-    SimpleMessageListenerContainer carListener (ConnectionFactory connectionFactory, MessageListenerAdapter carListenerAdapter) {
-        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(carQueueName);
-        container.setConsumerTagStrategy(tag -> "MyCarConsumer");
-        container.setMessageListener(carListenerAdapter);
-        return container;
     }
 
 }
